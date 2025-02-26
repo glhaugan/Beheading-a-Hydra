@@ -83,7 +83,6 @@ map2007 <- mapview(subset(comunas , NUMERO_COM %in% c(1, 3, 5, 6, 8, 13)),
 map2007 | map2010
 
 
-
 ### Some prep so we can fit a regression model
 
 #Get comuna for each school
@@ -106,6 +105,9 @@ schools_with_homicides$YEAR <- as.factor(schools_with_homicides$YEAR)
 #Log math scores
 schools_with_homicides$log_math <- log(schools_with_homicides$MATEMATICAS_PUNT)
 
+############## Run models to test effect of internecine war on homicides and test scores
+############## Note this is simplified from what is in the paper for several reasons, 
+############## the most important being that I cannot share the student-level data.
 
 ### Run the two-way fixed effects model w/ comuna FE for effect on homicides
 model1 <- feols(homicide_count ~ berna_comuna * berna_period | NUMERO_COM, 
