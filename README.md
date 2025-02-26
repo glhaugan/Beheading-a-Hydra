@@ -16,6 +16,7 @@ Some highlights from my work on a long-term project studying how the extradition
 ### Output
 The analysis script produces the following output.
 
-- Interactive map showing schools' homicide exposure in 2007 and 2010. 
+- Interactive map showing schools' homicide exposure in 2007 and 2010.
+  
 <iframe src="/output/MedellinMap.html" height="600px" width="100%" style="border:none;"></iframe>
 
