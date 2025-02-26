@@ -6,7 +6,7 @@
 
 ###Load packages
 packages <- c("tidyverse" , "foreign" , "sf" , "mapview", "leaflet.extras2" , 
-              "fixest", "lmtest" , "lwgeom")
+              "fixest", "lmtest" , "lwgeom", "htmlwidgets")
 lapply(packages, require, character.only = TRUE)
 rm(list=ls())
 
@@ -81,6 +81,7 @@ map2007 <- mapview(subset(comunas , NUMERO_COM %in% c(1, 3, 5, 6, 8, 13)),
 
 #Plot 2007 and 2010 back-to-back
 map2007 | map2010
+saveWidget(map, "C:/Users/Haugan-gregory/Desktop/Portfolio/Hydra/output/MedellinMap.html")
 
 
 ### Some prep so we can fit a regression model
