@@ -12,7 +12,7 @@ rm(list=ls())
 
 ### Read in Shapefile for Medellin's comunas
 comunas <- st_read(
-  "C:/Users/Haugan-gregory/Desktop/Portfolio/Hydra/data/Comunas/comunasmedellin.shp")
+  "/Hydra/data/Comunas/comunasmedellin.shp")
 # Find and fix invalid geometries
 st_is_valid(comunas) 
 # Show rows with invalid geometries
@@ -25,7 +25,7 @@ all(st_is_valid(comunas))
 ### Read in coordinates file for all crimes and keep only homicides. 
 #Drop obs missing coordinates.
 homicides <- read.csv(
-    "C:/Users/Haugan-gregory/Desktop/Portfolio/Hydra/data/Medellin_crimes.csv") %>%
+    "/Hydra/data/Medellin_crimes.csv") %>%
     subset(delito =="Homicidio Comun" & !is.na(x) & x != 0) 
 #Convert to sf object and set CRS
 homicides <- st_as_sf(homicides, coords = c("x","y")) %>%
@@ -33,7 +33,7 @@ homicides <- st_as_sf(homicides, coords = c("x","y")) %>%
 
 ### Read in file for schools
 schools <- read.csv(
-  "C:/Users/Haugan-gregory/Desktop/Portfolio/Hydra/data/Schools.csv")
+  "/Hydra/data/Schools.csv")
 schools <- st_as_sf(schools, coords = c("x","y")) %>%
   st_set_crs(st_crs(comunas))
 #Draw 250 meter buffer around schools
@@ -81,7 +81,7 @@ map2007 <- mapview(subset(comunas , NUMERO_COM %in% c(1, 3, 5, 6, 8, 13)),
 
 #Plot 2007 and 2010 back-to-back
 map2007 | map2010
-saveWidget(map, "C:/Users/Haugan-gregory/Desktop/Portfolio/Hydra/output/MedellinMap.html")
+saveWidget(map, "/Hydra/output/MedellinMap.html")
 
 
 ### Some prep so we can fit a regression model
