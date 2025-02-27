@@ -12,7 +12,7 @@ Some highlights from my work on a long-term project studying how the extradition
 
 ### Scripts
 - **Analysis.R**: R code for cleaning, analysis, and output. _Note: I originally programmed my work in Stata, but translated this bit of the work into R to demonstrate my R skills for this portfolio. It does not reproduce all results in the paper._
-- **_do**: Folder with the Stata do files for all work for this project. _Note: This code will not run since I cannot share the datasets it uses._
+- **_do**: Folder with the original Stata do files for all work for this project. _Note: This code will not run since I cannot share the individual-level datasets it uses._
 
 
 ### Output
