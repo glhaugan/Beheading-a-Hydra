@@ -19,3 +19,5 @@ Some highlights from my work on a long-term project studying how the extradition
 The analysis script in R produces the following output.
 
 - **MedellinMap.html**: Interactive map showing schools' homicide exposure in 2007 and 2010.
+- **plot.png**: Trendline plot for monthly homicides in Berna-controlled and non-controlled comunas.
+
