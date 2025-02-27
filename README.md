@@ -11,7 +11,7 @@ Some highlights from my work on a long-term project studying how the extradition
 - **Medellin_crimes.csv**: Data on reported crimes in Medellin for 2004-2013. Schools are identified by the DANE_sede school id variable. MATEMATICAS_punt is a variable containing the raw average score for 11th grade students on an annual standardized exam. Includes month (mes) and year of occurrence.
 
 ### Scripts
-- **Analysis.R**: R code for cleaning, analysis, and output. _Note: This code will not exactly reproduce what is in the paper. It is intended only as a demonstration of my skills in R. The results in the paper were run with individual-level data, which I cannot post on GitHub. I originally programmed my work in Stata, but translated this bit of the work into R to demonstrate my R skills for this portfolio._
+- **Analysis.R**: R code for cleaning, analysis, and output. _Note: I originally programmed my work in Stata, but translated this bit of the work into R to demonstrate my R skills for this portfolio. It does not reproduce all results in the paper._
 - **_do**: Folder with the Stata do files for all work for this project. _Note: This code will not run since I cannot share the datasets it uses._
 
 
