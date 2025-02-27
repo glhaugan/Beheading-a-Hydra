@@ -6,7 +6,7 @@
 
 ###Load packages
 packages <- c("tidyverse" , "foreign" , "sf" , "mapview", "leaflet.extras2" , 
-              "fixest", "lmtest" , "lwgeom", "htmlwidgets")
+              "fixest", "lmtest" , "lwgeom", "htmlwidgets" , "ggplot2")
 lapply(packages, require, character.only = TRUE)
 rm(list=ls())
 
@@ -93,6 +93,59 @@ map2007 <- mapview(subset(comunas , NUMERO_COM %in% c(1, 3, 5, 6, 8, 13)),
 map <- map2007 | map2010
 leaflet_map <- map@map
 saveWidget(leaflet_map, "output/MedellinMap.html")
+
+
+### Trendlines for monthly homicides in Berna-controlled and non-controlled comunas
+#Get comuna for each homicide and define as berna-controlled or not
+homicides <- st_join(homicides, comunas["NUMERO_COM"])
+homicides$berna_comuna <- as.factor(
+  ifelse(homicides$NUMERO_COM %in% c(1, 3, 5, 6, 8, 13), "Berna", "Non"))
+
+#monthly averages for berna and non-berna comunas
+homicides_monthly <- homicides %>%
+  group_by(berna_comuna , NUMERO_COM, year , mes_num) %>%
+  summarise(
+    homicides = n()
+  ) %>%
+  group_by(berna_comuna, year , mes_num) %>%
+  summarise(
+    homicides = mean(homicides, na.rm = TRUE),
+  ) %>%
+  arrange(berna_comuna, year , mes_num)
+
+#index the months
+homicides_monthly <- homicides_monthly %>%
+  group_by(berna_comuna) %>%
+  mutate(period = row_number())
+
+#wide format
+homicides_monthly <- homicides_monthly %>%
+  pivot_wider(names_from = berna_comuna, values_from = c(homicides))
+
+#make plot
+trendline <- ggplot(homicides_monthly, aes(x = period)) +
+  geom_smooth(aes(y = Non, color = "Non-Berna Comunas"), method = "loess", formula = y ~ poly(x, 2) , span = 0.75, se = FALSE) +
+  geom_smooth(aes(y = Berna, color = "Berna-Controlled Comunas"), method = "loess", formula = y ~ poly(x, 2) , span = 0.75, se = FALSE, linetype = "dashed") +
+  scale_x_continuous(breaks = c(1, 25, 49, 73, 97),
+                     labels = c("2004", "2006", "2008", "2010", "2012")) +
+  labs(
+    x = "Year",
+    y = "Homicides per Comuna",
+    title = "Panel A: Homicides in Berna-Controlled and Non-Berna Comunas (Monthly)",
+    caption = "Note: Trend lines use a local polynomial smoothing function."
+  ) +
+  theme_minimal() +
+  scale_color_manual(values = c("black", "grey")) +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
+    legend.title = element_blank() ,
+    legend.position = "bottom"
+  ) +
+  annotate("text", x = 55, y = 3, label = "Extradition to USA\nMay 2008", color = "black", size = 3, angle = 0, hjust = 0) +
+  geom_vline(xintercept = 53, linetype = "dashed", color = "black")
+ggsave("output/plot.png", plot = trendline, width = 12, height = 6, units = "in" , bg = "white")
 
 
 ### Some prep so we can fit a regression model
