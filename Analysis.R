@@ -1,6 +1,6 @@
 #####################################################################
 ####      Beheading a Hydra: Kingpin Extradition, Homicides,     ####  
-####  Education Outcomes, and the End of Medell?n's Pax Mafiosa  ####       
+####  Education Outcomes, and the End of Medellin's Pax Mafiosa  ####       
 ####                  Created by: Greg Haugan                    ####
 #####################################################################
 
@@ -12,7 +12,7 @@ rm(list=ls())
 
 ### Read in Shapefile for Medellin's comunas
 comunas <- st_read(
-  "/Hydra/data/Comunas/comunasmedellin.shp")
+  "data/Comunas/comunasmedellin.shp")
 # Find and fix invalid geometries
 st_is_valid(comunas) 
 # Show rows with invalid geometries
@@ -25,7 +25,7 @@ all(st_is_valid(comunas))
 ### Read in coordinates file for all crimes and keep only homicides. 
 #Drop obs missing coordinates.
 homicides <- read.csv(
-    "/Hydra/data/Medellin_crimes.csv") %>%
+    "data/Medellin_crimes.csv") %>%
     subset(delito =="Homicidio Comun" & !is.na(x) & x != 0) 
 #Convert to sf object and set CRS
 homicides <- st_as_sf(homicides, coords = c("x","y")) %>%
@@ -33,7 +33,7 @@ homicides <- st_as_sf(homicides, coords = c("x","y")) %>%
 
 ### Read in file for schools
 schools <- read.csv(
-  "/Hydra/data/Schools.csv")
+  "data/Schools.csv")
 schools <- st_as_sf(schools, coords = c("x","y")) %>%
   st_set_crs(st_crs(comunas))
 #Draw 250 meter buffer around schools
@@ -56,15 +56,25 @@ schools_with_homicides$homicide_count[is.na(schools_with_homicides$homicide_coun
 
 
 #And let's check that it worked - click on any school and confirm the homicide count
+schools_for_map <- schools_with_homicides %>%
+    select(DANE_sede , YEAR , homicide_count) %>% 
+    subset(YEAR %in% c(2007,2010)) %>%
+  pivot_wider(
+    names_from = YEAR,
+    values_from = homicide_count,
+    names_prefix = "homicides_"
+    )
+
 map2010 <- mapview(subset(comunas , NUMERO_COM %in% c(1, 3, 5, 6, 8, 13)), 
           col.regions = "darkgrey" , layer.name = "Berna-Controlled Comunas") + 
   mapview(subset(comunas , NUMERO_COM %in% c(2, 4, 7, 9, 10, 11 , 12 , 14 , 15 , 16)), 
           col.regions = "lightgrey" , layer.name = "Non-Controlled Comunas") + 
     mapview(subset(homicides , year == 2010), col.regions = "blue" , 
             layer.name = "Homicides - 2010") + 
-    mapview(subset(schools_with_homicides , YEAR == 2010), col.regions = "red", 
-            layer.name = "Schools") +
-    mapview(select(schools_250m, geometry), col.regions = "yellow" , layer.name = "250m Buffer")
+    mapview(select(schools_250m, geometry), col.regions = "yellow" , 
+            layer.name = "250m Buffer") +
+    mapview(schools_for_map , col.regions = "red", 
+            layer.name = "Schools")
 
 map2007 <- mapview(subset(comunas , NUMERO_COM %in% c(1, 3, 5, 6, 8, 13)), 
           col.regions = "darkgrey" , layer.name = "Berna-Controlled Comunas" , 
@@ -74,14 +84,15 @@ map2007 <- mapview(subset(comunas , NUMERO_COM %in% c(1, 3, 5, 6, 8, 13)),
           legend = FALSE) +
   mapview(subset(homicides , year == 2007), col.regions = "blue" , 
           layer.name = "Homicides - 2007") + 
-  mapview(subset(schools_with_homicides , YEAR == 2007), col.regions = "red", 
-          layer.name = "Schools" , legend = FALSE) +
   mapview(select(schools_250m, geometry), col.regions = "yellow" , 
-          layer.name = "250m Buffer" , legend = FALSE)
+          layer.name = "250m Buffer" , legend = FALSE) +
+  mapview(schools_for_map , col.regions = "red", 
+          layer.name = "Schools" , legend = FALSE)
 
 #Plot 2007 and 2010 back-to-back
-map2007 | map2010
-saveWidget(map, "/Hydra/output/MedellinMap.html")
+map <- map2007 | map2010
+leaflet_map <- map@map
+saveWidget(leaflet_map, "output/MedellinMap.html")
 
 
 ### Some prep so we can fit a regression model
@@ -106,9 +117,6 @@ schools_with_homicides$YEAR <- as.factor(schools_with_homicides$YEAR)
 #Log math scores
 schools_with_homicides$log_math <- log(schools_with_homicides$MATEMATICAS_PUNT)
 
-############## Run models to test effect of internecine war on homicides and test scores
-############## Note this is simplified from what is in the paper for several reasons, 
-############## the most important being that I cannot share the student-level data.
 
 ### Run the two-way fixed effects model w/ comuna FE for effect on homicides
 model1 <- feols(homicide_count ~ berna_comuna * berna_period | NUMERO_COM, 
@@ -116,7 +124,7 @@ model1 <- feols(homicide_count ~ berna_comuna * berna_period | NUMERO_COM,
                cluster = ~NUMERO_COM)
 
 # Summary with clustered standard errors
-summary(model1, cluster = "NUMERO_COM")
+summary1 <- summary(model1, cluster = "NUMERO_COM")
 
 ### Run the two-way fixed effects model w/ comuna FE for effect on test scores
 model2 <- feols(log_math ~ berna_comuna * berna_period | NUMERO_COM, 
@@ -124,4 +132,4 @@ model2 <- feols(log_math ~ berna_comuna * berna_period | NUMERO_COM,
                 cluster = ~NUMERO_COM)
 
 # Summary with clustered standard errors
-summary(model2, cluster = "NUMERO_COM")
+summary2 <- summary(model2, cluster = "NUMERO_COM")
