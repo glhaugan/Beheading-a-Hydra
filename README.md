@@ -1,5 +1,5 @@
 # Beheading a Hydra: Kingpin Extradition, Homicides, Education Outcomes, and the End of Medellin’s Pax Mafiosa
-#### Highlighted Skills: Causal inference, quantitative research, R, GIS and geospatial analysis
+#### Highlighted Skills: Causal inference, statistical programm in R and Stata, data cleaning/wrangling, data visualization, geospatial analysis
 
 Some highlights from my work on a long-term project studying how the extradition of a major crime lord impacted gang dynamics in Medellin, Colombia. 
 
